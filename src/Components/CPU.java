@@ -28,12 +28,13 @@ public class CPU {
     public void execute(){
         for(Page page:queries){
             page.setLastTimeUsed(time++);
-            allocate(processes,RAM);
-
+            page.getProcess().addToWorkingFrame(page);
+            allocate(processes, RAM);
             if(page.isOnDisk()){
                 page.getProcess().increasePageFaults();
                 if(page.getProcess().getFramesInUse() < page.getProcess().getFrames()){
                     RAM.addPage(page);
+//                    page.getProcess().setFramesInUse(page.getProcess().getFramesInUse() + 1);
                 }else{
                     replace(page);
                 }
@@ -41,8 +42,6 @@ public class CPU {
         }
         stats();
     }
-
-
 
     public void stats(){
         int totalPageFaults = 0;
@@ -53,6 +52,12 @@ public class CPU {
 
         System.out.println("Total page faults:"+totalPageFaults);
         System.out.printf("Average for %d processes:%.2f\n",processes.size(),(double)totalPageFaults/(double)processes.size());
+        System.out.printf("%-10s%-10s%-10s%-10s\n","process","pages","frames","faults");
+        int n = 1;
+
+        for(Process process:processes) {
+            System.out.printf("%-10d%-10d%-10d%-10d\n",n++,process.getLogicalMemory().size(),process.getFrames(),process.getPageFaults());
+        }
     }
 
     public void replace(Page page){
@@ -66,15 +71,18 @@ public class CPU {
                 if(findPage.getLastTimeUsed() < min && findPage.getFrame() != null){
                     min = findPage.getLastTimeUsed();
                     toReplace = findPage;
-                    break;
                 }
             }
         }
-        page.setFrame(toReplace.getFrame());
-        toReplace.setOnDisk(true);
-        page.setOnDisk(false);
-        toReplace.getFrame().setPage(page);
-        toReplace.setFrame(null);
+
+        if(toReplace!=null){
+            page.setFrame(toReplace.getFrame());
+            toReplace.setOnDisk(true);
+            page.setOnDisk(false);
+            toReplace.getFrame().setPage(page);
+            toReplace.setFrame(null);
+        }
+
     }
 
 
@@ -87,13 +95,16 @@ public class CPU {
         for(Process process:processes){
             process.setFramesInUse(0);
             process.setPageFaults(0);
+            process.setTimeFramePageFaults(0);
+            process.clearWorkingFrame();
         }
+        time = 0;
 
         for(Page page:queries){
             page.setOnDisk(true);
             page.setFrame(null);
+            page.setLastTimeUsed(0);
         }
-
         RAM = new RAM(RAM.getFrames().size());
     }
 

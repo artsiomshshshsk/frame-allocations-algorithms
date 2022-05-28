@@ -8,13 +8,10 @@ public class Process {
     private ArrayList<Page> logicalMemory = new ArrayList<>();
     private int frames;
     private int framesInUse = 0;
+    private int timeFramePageFaults = 0;
+    private int timeFrame = 10;
+    private ArrayList<Page> workSet = new ArrayList<>();
 
-
-    public void handlePageQuery(Page page){
-        if(page.isOnDisk()){
-            pageFaults++;
-        }
-    }
 
     public void generatePages(int amount){
         for(int i =0; i < amount;i++){
@@ -28,8 +25,8 @@ public class Process {
 
     public void increasePageFaults(){
         pageFaults++;
+        timeFramePageFaults++;
     }
-
 
     public void setPageFaults(int pageFaults) {
         this.pageFaults = pageFaults;
@@ -55,6 +52,58 @@ public class Process {
         return logicalMemory;
     }
 
+    public void setTimeFramePageFaults(int timeFramePageFaults) {
+        this.timeFramePageFaults = timeFramePageFaults;
+    }
+
+    public int getTimeFramePageFaults() {
+        return timeFramePageFaults;
+    }
+
+    public void increaseNumberOfFrames(){
+        frames++;
+    }
+
+    public void reduceNumberOfFrames(){
+        if(framesInUse == frames){
+            Page toReplace = null;
+            int min = Integer.MAX_VALUE;
+            for(Page findPage: getLogicalMemory()){
+                if(findPage.getLastTimeUsed() < min && findPage.getFrame() != null){
+                    min = findPage.getLastTimeUsed();
+                    toReplace = findPage;
+                }
+            }
+            toReplace.setFrame(null);
+            toReplace.setOnDisk(true);
+            framesInUse--;
+        }
+        frames--;
+    }
 
 
+    public void addToWorkingFrame(Page page){
+        if(!workSet.contains(page)){
+            workSet.add(page);
+        }
+    }
+
+    public int workingFrameSize(){
+        int size = workSet.size();
+        clearWorkingFrame();
+        return size;
+    }
+
+    public void clearWorkingFrame(){
+        workSet = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "Process {" +
+                " pages=" + logicalMemory.size() +
+                ", frames=" + frames +
+                ", pageFaults=" + pageFaults +
+                '}';
+    }
 }

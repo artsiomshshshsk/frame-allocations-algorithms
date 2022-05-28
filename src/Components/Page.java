@@ -68,7 +68,6 @@ public class Page {
     public String toString() {
         return "Page{" +
                 "lastTimeUsed=" + lastTimeUsed +
-                ", process=" + process +
                 ", ID=" + ID +
                 ", isOnDisk=" + isOnDisk +
                 ", frame=" + frame +

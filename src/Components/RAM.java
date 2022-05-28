@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 public class RAM {
     private ArrayList<Frame> frames;
+    private int timeFrame = 500;
+    private int LocalityModelTimeFrame = 20;
+    private int timeFrameCount = 0;
 
     public RAM(int size) {
         frames = new ArrayList<>(size);
@@ -34,6 +37,30 @@ public class RAM {
                 break;
             }
         }
+    }
+
+    public int getTimeFrame() {
+        return timeFrame;
+    }
+
+    public int getLocalityModelTimeFrame() {
+        return LocalityModelTimeFrame;
+    }
+
+    public void setLocalityModelTimeFrame(int localityModelTimeFrame) {
+        LocalityModelTimeFrame = localityModelTimeFrame;
+    }
+
+    public void setTimeFrame(int timeFrame) {
+        this.timeFrame = timeFrame;
+    }
+
+    public int getTimeFrameCount() {
+        return timeFrameCount;
+    }
+
+    public void setTimeFrameCount(int timeFrameCount) {
+        this.timeFrameCount = timeFrameCount;
     }
 
     public ArrayList<Frame> getFrames() {
